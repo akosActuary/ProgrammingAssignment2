@@ -1,4 +1,4 @@
-# testing the functions in the instructions
+### Testing the functions in the instructions ----
 
 makeVector <- function(x = numeric()) {
   m <- NULL
@@ -37,7 +37,7 @@ z_2 <- makeVector(x_2)
 cachemean(z_2)
 cachemean(z)
 
-### Trying it with a matrix
+### Trying it with a matrix ----
 
 # test matrix
 A <- matrix( c(5, 1, 0,
@@ -46,3 +46,52 @@ A <- matrix( c(5, 1, 0,
 A_inverse <- solve(A)
 # gives back the ID mtx
 A %*% A_inverse
+
+
+
+
+makeCacheMatrix <- function(x = matrix()) {
+  inv <- NULL
+  set <- function(y) {
+    x <<- y
+    inv <<- NULL
+  }
+  get <- function() x
+  setinv <- function(solve) inv <<- solve
+  getinv <- function() inv
+  list(set = set, 
+       get = get,
+       setinv = setinv,
+       getinv = getinv)
+}
+
+
+cacheSolve <- function(x, ...) {
+  inv <- x$getinv()
+  if(!is.null(inv)) {
+    message("getting cached data")
+    return(inv)
+  }
+  data <- x$get()
+  inv <- solve(data, ...)
+  x$setinv(inv)
+  inv
+}
+
+B <- makeCacheMatrix(x = A)
+cacheSolve(B)
+
+C <- A*2
+D <- makeCacheMatrix(C)
+C_inv <- cacheSolve(D)
+C %*% C_inv
+
+cacheSolve(D)
+
+# testing a non-invertible matrix
+A2 <- matrix( c(1, -2, -3, 6), nrow = 2, byrow = TRUE)
+A2
+solve(A2)
+
+B2 <- makeCacheMatrix(A2)
+cacheSolve(B2)
